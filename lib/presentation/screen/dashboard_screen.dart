@@ -1,5 +1,6 @@
 import 'package:bitaqwa/utils/color_constant.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -102,19 +103,24 @@ class DashboardScreen extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           child: Row(
             children: [
-              Column(
-                children: [
-                  Image.asset(
-                    'assets/images/ic_menu_doa.png',
-                  ),
-                  Text(
-                    "Doa-doa",
-                    style: TextStyle(
-                      fontFamily: "PoppinsSemiBold",
-                      color: ColorConstant.colorWhite,
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(context, 'doa');
+                },
+                child: Column(
+                  children: [
+                    Image.asset(
+                      'assets/images/ic_menu_doa.png',
                     ),
-                  ),
-                ],
+                    Text(
+                      "Doa-doa",
+                      style: TextStyle(
+                        fontFamily: "PoppinsSemiBold",
+                        color: ColorConstant.colorWhite,
+                      ),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(
                 width: 12,
