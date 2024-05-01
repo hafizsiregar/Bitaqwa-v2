@@ -1,5 +1,6 @@
 import 'package:bitaqwa/presentation/screen/dashboard_screen.dart';
 import 'package:bitaqwa/presentation/screen/doa_screen.dart';
+import 'package:bitaqwa/presentation/screen/zakat_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -18,7 +19,8 @@ class MyApp extends StatelessWidget {
       ),
       routes: {
         '/': (context) => const DashboardScreen(),
-        'doa': (context) => const DoaScreen()
+        'doa': (context) => const DoaScreen(),
+        'zakat': (context) => const ZakatScreen(),
       },
     );
   }
