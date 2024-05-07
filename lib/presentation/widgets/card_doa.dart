@@ -9,7 +9,6 @@ class CardDoa extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      // padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
         color: ColorConstant.colorWhite,

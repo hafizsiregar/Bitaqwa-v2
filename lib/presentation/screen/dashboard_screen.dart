@@ -1,4 +1,5 @@
 import 'package:bitaqwa/utils/color_constant.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -147,19 +148,24 @@ class DashboardScreen extends StatelessWidget {
               const SizedBox(
                 width: 12,
               ),
-              Column(
-                children: [
-                  Image.asset(
-                    'assets/images/ic_menu_jadwal_sholat.png',
-                  ),
-                  Text(
-                    "Jadwal Sholat",
-                    style: TextStyle(
-                      fontFamily: "PoppinsSemiBold",
-                      color: ColorConstant.colorWhite,
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(context, 'jadwal-sholat');
+                },
+                child: Column(
+                  children: [
+                    Image.asset(
+                      'assets/images/ic_menu_jadwal_sholat.png',
                     ),
-                  ),
-                ],
+                    Text(
+                      "Jadwal Sholat",
+                      style: TextStyle(
+                        fontFamily: "PoppinsSemiBold",
+                        color: ColorConstant.colorWhite,
+                      ),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(
                 width: 12,

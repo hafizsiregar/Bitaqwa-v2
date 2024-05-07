@@ -1,3 +1,4 @@
+import 'package:bitaqwa/presentation/widgets/card_result_harta.dart';
 import 'package:bitaqwa/utils/color_constant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
@@ -62,6 +63,116 @@ class _ZakatScreenState extends State<ZakatScreen> {
     String formattedTotalHarta = controllerRupiah.text.replaceAll('.', ',');
     String formattedZakatDikeluarkan =
         zakatDikeluarkan.toStringAsFixed(0).replaceAll('.', ',');
+
+    Widget cardHarta() {
+      return Container(
+        padding: const EdgeInsets.all(24),
+        margin: const EdgeInsets.symmetric(horizontal: 24),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: Colors.grey[200],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Total Harta",
+              style: TextStyle(
+                color: ColorConstant.colorPrimary,
+                fontSize: 14,
+                fontFamily: "PoppinsMedium",
+              ),
+            ),
+            const SizedBox(
+              height: 16,
+            ),
+            TextFormField(
+              controller: controllerRupiah,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: 'Masukkan Total Harta',
+                labelStyle: TextStyle(
+                  color: ColorConstant.colorText,
+                  fontSize: 14,
+                ),
+                fillColor: ColorConstant.colorWhite,
+                filled: true,
+                prefixText: 'Rp. ',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(
+                    12.0,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                  borderSide: BorderSide(
+                    color: ColorConstant.colorPrimary,
+                    width: 2.0,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                  borderSide: BorderSide(
+                    color: ColorConstant.colorPrimary,
+                    width: 2.0,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 16,
+            ),
+            ElevatedButton(
+              onPressed: () {
+                hitungZakat();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ColorConstant.colorPrimary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(
+                    12,
+                  ),
+                ),
+                padding: const EdgeInsets.all(12),
+                minimumSize: const Size(
+                  double.infinity,
+                  0,
+                ),
+              ),
+              child: Text(
+                "OK",
+                style: TextStyle(
+                  color: ColorConstant.colorWhite,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    Widget cardResult(
+        String formattedTotalHarta, String formattedZakatDikeluarkan) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CardResultHarta(
+            title: "Total Uang",
+            result: "Rp. $formattedTotalHarta",
+            color: Colors.red[300]!,
+          ),
+          const SizedBox(
+            width: 24,
+          ),
+          CardResultHarta(
+            title: "Zakat Dikeluarkan",
+            result: "Rp. $formattedZakatDikeluarkan",
+            color: Colors.purple[300]!,
+          ),
+        ],
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: ColorConstant.colorPrimary,
@@ -86,166 +197,11 @@ class _ZakatScreenState extends State<ZakatScreen> {
         children: [
           Image.asset('assets/images/bg_header_zakat.png'),
           const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(24),
-            margin: const EdgeInsets.symmetric(horizontal: 24),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: Colors.grey[200],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Total Harta",
-                  style: TextStyle(
-                    color: ColorConstant.colorPrimary,
-                    fontSize: 14,
-                    fontFamily: "PoppinsMedium",
-                  ),
-                ),
-                const SizedBox(
-                  height: 16,
-                ),
-                TextFormField(
-                  controller: controllerRupiah,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    labelText: 'Masukkan Total Harta',
-                    labelStyle: TextStyle(
-                      color: ColorConstant.colorText,
-                      fontSize: 14,
-                    ),
-                    fillColor: ColorConstant.colorWhite,
-                    filled: true,
-                    prefixText: 'Rp. ',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(
-                        12.0,
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12.0),
-                      borderSide: BorderSide(
-                        color: ColorConstant.colorPrimary,
-                        width: 2.0,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12.0),
-                      borderSide: BorderSide(
-                        color: ColorConstant.colorPrimary,
-                        width: 2.0,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 16,
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    hitungZakat();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ColorConstant.colorPrimary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                        12,
-                      ),
-                    ),
-                    padding: const EdgeInsets.all(12),
-                    minimumSize: const Size(
-                      double.infinity,
-                      0,
-                    ),
-                  ),
-                  child: Text(
-                    "OK",
-                    style: TextStyle(
-                      color: ColorConstant.colorWhite,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          cardHarta(),
           const SizedBox(
             height: 36,
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 16,
-                ),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  color: Colors.red[400],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Total Uang",
-                      style: TextStyle(
-                        color: ColorConstant.colorWhite,
-                        fontFamily: "PoppinsMedium",
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 32,
-                    ),
-                    Text(
-                      "Rp. $formattedTotalHarta",
-                      style: TextStyle(
-                        color: ColorConstant.colorWhite,
-                        fontFamily: "PoppinsBold",
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(
-                width: 24,
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 16,
-                ),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  color: Colors.purple[400],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Zakat Dikeluarkan",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: ColorConstant.colorWhite,
-                        fontFamily: "PoppinsMedium",
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 32,
-                    ),
-                    Text(
-                      "Rp. $formattedZakatDikeluarkan",
-                      style: TextStyle(
-                        color: ColorConstant.colorWhite,
-                        fontFamily: "PoppinsBold",
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+          cardResult(formattedTotalHarta, formattedZakatDikeluarkan),
         ],
       ),
     );
