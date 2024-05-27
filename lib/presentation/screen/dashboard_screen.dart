@@ -1,10 +1,74 @@
+import 'package:adhan/adhan.dart';
 import 'package:bitaqwa/utils/color_constant.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:intl/intl.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  String _location = "Mengambil lokasi...";
+  String _prayerName = "Loading...";
+  String _prayerTime = "Loading...";
+  String _backgroundImage = 'assets/images/bg_header_dashboard_morning.png';
+
+  @override
+  void initState() {
+    super.initState();
+    _updatePrayerTimes();
+  }
+
+  Future<void> _updatePrayerTimes() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(position.latitude, position.longitude);
+      Placemark place = placemarks.first;
+
+      final myCoordinates = Coordinates(position.latitude, position.longitude);
+      final params = CalculationMethod.karachi.getParameters();
+      final prayerTimes = PrayerTimes.today(myCoordinates, params);
+      final now = DateTime.now();
+
+      // Find the next prayer time
+      Prayer nextPrayer = prayerTimes.nextPrayer();
+      DateTime? nextPrayerTime = prayerTimes.timeForPrayer(nextPrayer);
+
+      setState(() {
+        _location = "${place.subAdministrativeArea}, ${place.locality}";
+        _prayerName = nextPrayer.toString().split('.').last;
+        _prayerTime = nextPrayerTime != null
+            ? DateFormat.jm().format(nextPrayerTime)
+            : "N/A";
+        _backgroundImage = _getBackgroundImage(now);
+      });
+    } catch (e) {
+      setState(() {
+        _location = "Lokasi tidak tersedia";
+        _prayerName = "Error";
+        _prayerTime = "Error";
+      });
+      print("Error obtaining location: $e");
+    }
+  }
+
+  String _getBackgroundImage(DateTime now) {
+    int hour = now.hour;
+    if (hour < 12) {
+      return 'assets/images/bg_header_dashboard_morning.png';
+    } else if (hour < 18) {
+      return 'assets/images/bg_header_dashboard_afternoon.png';
+    } else {
+      return 'assets/images/bg_header_dashboard_night.png';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -12,11 +76,9 @@ class DashboardScreen extends StatelessWidget {
       return Container(
         height: 250,
         width: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage(
-              'assets/images/bg_header_doa.png',
-            ),
+            image: AssetImage(_backgroundImage),
             fit: BoxFit.cover,
           ),
         ),
@@ -32,7 +94,7 @@ class DashboardScreen extends StatelessWidget {
                   color: ColorConstant.colorWhite,
                 ),
                 child: Text(
-                  "Assalamualaikum Haura",
+                  "Assalamualaikum Fulan",
                   style: TextStyle(
                     color: ColorConstant.colorText,
                     fontFamily: 'PoppinsMedium',
@@ -44,7 +106,7 @@ class DashboardScreen extends StatelessWidget {
               height: 18,
             ),
             Text(
-              "Dzuhur",
+              _prayerName,
               style: TextStyle(
                 color: ColorConstant.colorText,
                 fontSize: 16,
@@ -55,7 +117,7 @@ class DashboardScreen extends StatelessWidget {
               height: 4,
             ),
             Text(
-              "12:04",
+              _prayerTime,
               style: TextStyle(
                 color: ColorConstant.colorText,
                 fontSize: 26,
@@ -77,7 +139,7 @@ class DashboardScreen extends StatelessWidget {
                   width: 6,
                 ),
                 Text(
-                  "Kecamatan Jonggol",
+                  _location,
                   style: TextStyle(
                     color: ColorConstant.colorText,
                     fontFamily: 'PoppinsRegular',
