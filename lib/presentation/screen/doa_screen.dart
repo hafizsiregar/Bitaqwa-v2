@@ -1,6 +1,7 @@
+import 'package:bitaqwa/presentation/screen/doa_list_screen.dart';
+import 'package:flutter/material.dart';
 import 'package:bitaqwa/presentation/widgets/card_doa.dart';
 import 'package:bitaqwa/utils/color_constant.dart';
-import 'package:flutter/material.dart';
 
 class DoaScreen extends StatelessWidget {
   const DoaScreen({super.key});
@@ -33,38 +34,95 @@ class DoaScreen extends StatelessWidget {
             'assets/images/bg_header_doa.png',
           ),
           Expanded(
-            child: GridView.count(
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 24,
-              crossAxisCount: 3,
-              children: const [
-                CardDoa(
-                  image: 'assets/images/ic_doa_pagi_malam.png',
-                  title: "Pagi & Malam",
-                ),
-                CardDoa(
-                  image: 'assets/images/ic_doa_rumah.png',
-                  title: "Rumah",
-                ),
-                CardDoa(
-                  image: 'assets/images/ic_doa_makanan_minuman.png',
-                  title: "Makanan & Minuman",
-                ),
-                CardDoa(
-                  image: 'assets/images/ic_doa_perjalanan.png',
-                  title: "Perjalanan",
-                ),
-                CardDoa(
-                  image: 'assets/images/ic_doa_sholat.png',
-                  title: "Sholat",
-                ),
-                CardDoa(
-                  image: 'assets/images/ic_doa_etika_baik.png',
-                  title: "Etika Baik",
-                ),
-              ],
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: GridView.count(
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 24,
+                crossAxisCount: 3,
+                children: [
+                  CardDoa(
+                    image: 'assets/images/ic_doa_pagi_malam.png',
+                    title: "Pagi & Malam",
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              const DoaListScreen(category: "Pagi & Malam"),
+                        ),
+                      );
+                    },
+                  ),
+                  CardDoa(
+                    image: 'assets/images/ic_doa_rumah.png',
+                    title: "Rumah",
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              const DoaListScreen(category: "Rumah"),
+                        ),
+                      );
+                    },
+                  ),
+                  CardDoa(
+                    image: 'assets/images/ic_doa_makanan_minuman.png',
+                    title: "Makanan & Minuman",
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const DoaListScreen(
+                              category: "Makanan & Minuman"),
+                        ),
+                      );
+                    },
+                  ),
+                  CardDoa(
+                    image: 'assets/images/ic_doa_perjalanan.png',
+                    title: "Perjalanan",
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              const DoaListScreen(category: "Perjalanan"),
+                        ),
+                      );
+                    },
+                  ),
+                  CardDoa(
+                    image: 'assets/images/ic_doa_sholat.png',
+                    title: "Sholat",
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              const DoaListScreen(category: "Sholat"),
+                        ),
+                      );
+                    },
+                  ),
+                  CardDoa(
+                    image: 'assets/images/ic_doa_etika_baik.png',
+                    title: "Etika Baik",
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              const DoaListScreen(category: "Etika Baik"),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
-          )
+          ),
         ],
       ),
     );

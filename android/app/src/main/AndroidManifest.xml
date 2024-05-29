@@ -5,6 +5,9 @@
 <!-- Izin untuk akses lokasi tepat -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
+    <!-- Izin untuk akses internet -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:label="bitaqwa"
         android:name="${applicationName}"

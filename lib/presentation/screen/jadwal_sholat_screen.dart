@@ -1,11 +1,13 @@
-import 'package:adhan/adhan.dart';
-import 'package:bitaqwa/presentation/widgets/time.dart';
-import 'package:bitaqwa/utils/color_constant.dart';
+import 'package:adhan_dart/adhan_dart.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:bitaqwa/presentation/widgets/time.dart';
+import 'package:bitaqwa/utils/color_constant.dart';
 
 class JadwalSholatScreen extends StatefulWidget {
   const JadwalSholatScreen({super.key});
@@ -39,6 +41,7 @@ class _JadwalSholatScreenState extends State<JadwalSholatScreen> {
   @override
   void initState() {
     super.initState();
+    tz.initializeTimeZones();
     _determinePositionAndPrayerTimes();
   }
 
@@ -60,9 +63,17 @@ class _JadwalSholatScreenState extends State<JadwalSholatScreen> {
 
   void _calculatePrayerTimes(Position position) {
     final coordinates = Coordinates(position.latitude, position.longitude);
-    final params = CalculationMethod.karachi.getParameters();
+    final params = CalculationMethod.karachi();
     params.madhab = Madhab.hanafi;
-    _prayerTimes = PrayerTimes.today(coordinates, params);
+
+    final location = tz.getLocation('Asia/Jakarta');
+    final date = tz.TZDateTime.from(DateTime.now(), location);
+
+    _prayerTimes = PrayerTimes(
+      coordinates: coordinates,
+      date: date,
+      calculationParameters: params,
+    );
     _getLocationName(position.latitude, position.longitude);
     setState(() {});
   }
@@ -106,7 +117,8 @@ class _JadwalSholatScreenState extends State<JadwalSholatScreen> {
                       Align(
                         alignment: Alignment.topCenter,
                         child: Text(
-                          "Rabu, 17 Maret",
+                          DateFormat('EEEE, d MMMM', 'id_ID')
+                              .format(DateTime.now()),
                           style: TextStyle(
                             fontSize: 24,
                             fontFamily: "PoppinsSemiBold",
@@ -152,7 +164,9 @@ class _JadwalSholatScreenState extends State<JadwalSholatScreen> {
                           children: [
                             Time(
                               pray: "Subuh",
-                              time: DateFormat.jm().format(_prayerTimes!.fajr),
+                              time: _prayerTimes!.asr != null
+                                  ? DateFormat.jm().format(_prayerTimes!.fajr!)
+                                  : "N/A",
                               image: "assets/images/img_clock.png",
                             ),
                             const SizedBox(
@@ -168,8 +182,10 @@ class _JadwalSholatScreenState extends State<JadwalSholatScreen> {
                             ),
                             Time(
                               pray: "Terbit",
-                              time:
-                                  DateFormat.jm().format(_prayerTimes!.sunrise),
+                              time: _prayerTimes!.sunrise != null
+                                  ? DateFormat.jm()
+                                      .format(_prayerTimes!.sunrise!)
+                                  : "N/A",
                               image: "assets/images/img_clock.png",
                             ),
                             const SizedBox(
@@ -185,7 +201,9 @@ class _JadwalSholatScreenState extends State<JadwalSholatScreen> {
                             ),
                             Time(
                               pray: "Dzuhur",
-                              time: DateFormat.jm().format(_prayerTimes!.dhuhr),
+                              time: _prayerTimes!.dhuhr != null
+                                  ? DateFormat.jm().format(_prayerTimes!.dhuhr!)
+                                  : "N/A",
                               image: "assets/images/img_clock.png",
                             ),
                             const SizedBox(
@@ -201,7 +219,9 @@ class _JadwalSholatScreenState extends State<JadwalSholatScreen> {
                             ),
                             Time(
                               pray: "Ashar",
-                              time: DateFormat.jm().format(_prayerTimes!.asr),
+                              time: _prayerTimes!.asr != null
+                                  ? DateFormat.jm().format(_prayerTimes!.asr!)
+                                  : "N/A",
                               image: "assets/images/img_clock.png",
                             ),
                             const SizedBox(
@@ -217,8 +237,10 @@ class _JadwalSholatScreenState extends State<JadwalSholatScreen> {
                             ),
                             Time(
                               pray: "Maghrib",
-                              time:
-                                  DateFormat.jm().format(_prayerTimes!.maghrib),
+                              time: _prayerTimes!.maghrib != null
+                                  ? DateFormat.jm()
+                                      .format(_prayerTimes!.maghrib!)
+                                  : "N/A",
                               image: "assets/images/img_clock.png",
                             ),
                             const SizedBox(
@@ -234,7 +256,9 @@ class _JadwalSholatScreenState extends State<JadwalSholatScreen> {
                             ),
                             Time(
                               pray: "Isya",
-                              time: DateFormat.jm().format(_prayerTimes!.isha),
+                              time: _prayerTimes!.isha != null
+                                  ? DateFormat.jm().format(_prayerTimes!.isha!)
+                                  : "N/A",
                               image: "assets/images/img_clock.png",
                             ),
                           ],
