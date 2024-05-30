@@ -1,3 +1,4 @@
+import 'package:bitaqwa/data/doa_data.dart';
 import 'package:bitaqwa/presentation/screen/detail_doa_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:bitaqwa/utils/color_constant.dart';
@@ -76,87 +77,5 @@ class DoaListScreen extends StatelessWidget {
         },
       ),
     );
-  }
-
-  List<Map<String, String>> getDoaList(String category) {
-    switch (category) {
-      case "Makanan & Minuman":
-        return [
-          {
-            'image': 'assets/images/ic_doa_makanan_minuman.png',
-            'title': 'Do’a Sebelum Makan',
-            'arabicText': 'بِسْمِ اللَّهِ',
-            'translation': 'Dengan menyebut nama Allah',
-            'reference': 'Hadist Riwayat Abu Dawud dan At-Tirmidzi'
-          },
-          {
-            'image': 'assets/images/ic_doa_makanan_minuman.png',
-            'title': 'Do’a Setelah Makan',
-            'arabicText':
-                'الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنِي هَذَا وَرَزَقَنِيهِ مِنْ غَيْرِ حَوْلٍ مِنِّي وَلَا قُوَّةٍ',
-            'translation':
-                'Segala puji bagi Allah yang telah memberiku makanan ini dan rezeki ini dengan tanpa daya dan kekuatan dariku',
-            'reference': 'Hadist Riwayat Abu Dawud, At-Tirmidzi, dan Ibnu Majah'
-          },
-          {
-            'image': 'assets/images/ic_doa_makanan_minuman.png',
-            'title': 'Do’a Orang Yang Memberi Minum',
-            'arabicText':
-                'اللَّهُمَّ أَطْعِمْ مَنْ أَطْعَمَنِي، وَاسْقِ مَنْ سَقَانِي',
-            'translation':
-                'Ya Allah, berilah makan orang yang memberi makan kepadaku dan berilah minum orang yang memberi minum kepadaku',
-            'reference': 'HR. Muslim'
-          },
-          {
-            'image': 'assets/images/ic_doa_makanan_minuman.png',
-            'title': 'Do’a Berbuka Di Rumah Orang Lain',
-            'arabicText':
-                'أَفْطَرَ عِنْدَكُمُ الصَّائِمُونَ، وَأَكَلَ طَعَامَكُمُ الأَبْرَارُ، وَصَلَّتْ عَلَيْكُمُ الْمَلاَئِكَةُ',
-            'translation':
-                'Semoga orang-orang yang berpuasa berbuka di tempat kalian, dan semoga orang-orang baik makan makanan kalian, dan semoga para malaikat mendoakan kalian',
-            'reference': 'HR. Abu Dawud'
-          },
-          {
-            'image': 'assets/images/ic_doa_makanan_minuman.png',
-            'title': 'Do’a Berbuka Puasa',
-            'arabicText':
-                'ذَهَبَ الظَّمَأُ، وَابْتَلَّتِ الْعُرُوقُ، وَثَبَتَ الأَجْرُ إِنْ شَاءَ اللَّهُ',
-            'translation':
-                'Telah hilang dahaga, urat-urat telah basah, dan telah ditetapkan pahala insya Allah',
-            'reference': 'HR. Abu Dawud'
-          },
-        ];
-      case "Pagi & Malam":
-        return [
-          {
-            'image': 'assets/images/ic_doa_pagi_malam.png',
-            'title': 'Do’a Sebelum Tidur',
-            'arabicText': 'اللَّهُمَّ بِاسْمِكَ أَمُوتُ وَأَحْيَا',
-            'translation': 'Ya Allah, dengan namaMu aku mati dan aku hidup.',
-            'reference': 'Hadist Riwayat Bukhori'
-          },
-          {
-            'image': 'assets/images/ic_doa_pagi_malam.png',
-            'title': 'Do’a Bangun Tdiur',
-            'arabicText':
-                'الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ',
-            'translation':
-                'Segala puji bagi Allah yang menghidupkanku dan mematikanku dan kepadaNya lah kita dikembalikan.',
-            'reference': 'Hadist Riwayat Bukhori'
-          },
-          {
-            'image': 'assets/images/ic_doa_pagi_malam.png',
-            'title': 'Doa Apabila Ada Yang Menakutkan Dalam Tidur',
-            'arabicText':
-                'أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ غَضَبِهِ وَعِقَابِهِ، وَشَرِّ عِبَادِهِ، وَمِنْ هَمَزَاتِ الشَّيَاطِينِ وَأَنْ يَحْضُرُونِ',
-            'translation':
-                'Aku berlindung dengan kalimat Allah yang sempurna dari kemarahan, siksaan dan kejahatan hamba-hamba-Nya dan dari godaan setan serta jangan sampai setan mendatangiku',
-            'reference': 'Hadist Riwayat Abu Dawud dan Shohih At-Tirmidzi'
-          },
-        ];
-      // Tambahkan kategori lain di sini
-      default:
-        return [];
-    }
   }
 }

@@ -1,13 +1,12 @@
-import 'package:adhan_dart/adhan_dart.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:timezone/timezone.dart' as tz;
-import 'package:timezone/data/latest.dart' as tz;
 import 'package:bitaqwa/presentation/widgets/time.dart';
 import 'package:bitaqwa/utils/color_constant.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:permission_handler/permission_handler.dart';
 
 class JadwalSholatScreen extends StatefulWidget {
   const JadwalSholatScreen({super.key});
@@ -17,65 +16,59 @@ class JadwalSholatScreen extends StatefulWidget {
 }
 
 class _JadwalSholatScreenState extends State<JadwalSholatScreen> {
-  PrayerTimes? _prayerTimes;
-  String? _locationName; // Untuk menyimpan nama lokasi
+  List<dynamic>? _jadwalSholat;
+  String? _locationName;
+  bool _isLoading = true;
 
-  // Fungsi untuk mendapatkan nama lokasi dari koordinat
-  Future<void> _getLocationName(double latitude, double longitude) async {
-    try {
-      List<Placemark> placemarks =
-          await placemarkFromCoordinates(latitude, longitude);
-      Placemark place = placemarks.first;
-      setState(() {
-        // Contoh: Menggabungkan nama kecamatan dan kota
-        _locationName = "${place.subAdministrativeArea}, ${place.locality}";
-      });
-    } catch (e) {
-      print("Failed to get placemark: $e");
-      setState(() {
-        _locationName = "Lokasi tidak dikenal";
-      });
+  Future<List<dynamic>> fetchJadwalSholat(
+      String city, String month, String year) async {
+    final url =
+        'https://raw.githubusercontent.com/lakuapik/jadwalsholatorg/master/adzan/$city/$year/$month.json';
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to load jadwal sholat');
     }
   }
 
   @override
   void initState() {
     super.initState();
-    tz.initializeTimeZones();
-    _determinePositionAndPrayerTimes();
+    _fetchLocationAndJadwalSholat();
   }
 
-  Future<void> _determinePositionAndPrayerTimes() async {
+  Future<void> _fetchLocationAndJadwalSholat() async {
     var status = await Permission.location.request();
     if (status.isGranted) {
       try {
         Position position = await Geolocator.getCurrentPosition();
-        _calculatePrayerTimes(position);
+        List<Placemark> placemarks = await placemarkFromCoordinates(
+            position.latitude, position.longitude);
+        Placemark place = placemarks.first;
+
+        // Gunakan kota yang sesuai dari daftar kota API
+        String city = "bogor"; // pastikan kota ini ada di daftar kota API
+        String month = DateFormat('MM').format(DateTime.now());
+        String year = DateFormat('yyyy').format(DateTime.now());
+
+        List<dynamic> jadwalSholat = await fetchJadwalSholat(city, month, year);
+
+        setState(() {
+          _jadwalSholat = jadwalSholat;
+          _locationName = "${place.subAdministrativeArea}, ${place.locality}";
+          _isLoading = false;
+        });
       } catch (e) {
-        // Handle jika tidak bisa mendapatkan posisi
-        print('Error: $e');
+        setState(() {
+          _isLoading = false;
+        });
+        print("Error fetching location or jadwal sholat: $e");
       }
     } else {
-      // Mungkin ingin menampilkan dialog atau snackbar bahwa izin diperlukan
       print('Location permission not granted');
     }
-  }
-
-  void _calculatePrayerTimes(Position position) {
-    final coordinates = Coordinates(position.latitude, position.longitude);
-    final params = CalculationMethod.karachi();
-    params.madhab = Madhab.hanafi;
-
-    final location = tz.getLocation('Asia/Jakarta');
-    final date = tz.TZDateTime.from(DateTime.now(), location);
-
-    _prayerTimes = PrayerTimes(
-      coordinates: coordinates,
-      date: date,
-      calculationParameters: params,
-    );
-    _getLocationName(position.latitude, position.longitude);
-    setState(() {});
   }
 
   @override
@@ -100,175 +93,123 @@ class _JadwalSholatScreenState extends State<JadwalSholatScreen> {
           },
         ),
       ),
-      body: _prayerTimes == null
+      body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : Container(
-              color: Colors.blue[50],
-              child: Stack(
-                children: [
-                  Image.asset(
-                    'assets/images/bg_header_jadwal_sholat.png',
-                  ),
-                  Column(
+          : _jadwalSholat == null
+              ? const Center(child: Text("Failed to load jadwal sholat"))
+              : Container(
+                  color: Colors.blue[50],
+                  child: Stack(
                     children: [
-                      const SizedBox(
-                        height: 48,
+                      Image.asset(
+                        'assets/images/bg_header_jadwal_sholat.png',
                       ),
-                      Align(
-                        alignment: Alignment.topCenter,
-                        child: Text(
-                          DateFormat('EEEE, d MMMM', 'id_ID')
-                              .format(DateTime.now()),
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontFamily: "PoppinsSemiBold",
-                            color: ColorConstant.colorWhite,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 16,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      Column(
                         children: [
-                          Icon(
-                            Icons.location_on_rounded,
-                            size: 14,
-                            color: ColorConstant.colorPrimary,
+                          const SizedBox(height: 48),
+                          Align(
+                            alignment: Alignment.topCenter,
+                            child: Text(
+                              DateFormat('EEEE, d MMMM', 'id_ID')
+                                  .format(DateTime.now()),
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontFamily: "PoppinsSemiBold",
+                                color: ColorConstant.colorWhite,
+                              ),
+                            ),
                           ),
-                          const SizedBox(
-                            width: 6,
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.location_on_rounded,
+                                size: 14,
+                                color: ColorConstant.colorPrimary,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                _locationName ?? "Mengambil lokasi...",
+                                style: TextStyle(
+                                  color: ColorConstant.colorWhite,
+                                  fontFamily: 'PoppinsRegular',
+                                ),
+                              ),
+                            ],
                           ),
-                          Text(
-                            _locationName ?? "Mengambil lokasi...",
-                            style: TextStyle(
+                          const SizedBox(height: 48),
+                          Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 24),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 32, vertical: 24),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
                               color: ColorConstant.colorWhite,
-                              fontFamily: 'PoppinsRegular',
+                            ),
+                            child: Column(
+                              children: [
+                                Time(
+                                  pray: "Subuh",
+                                  time: _jadwalSholat![0]['shubuh'] ?? "N/A",
+                                  image: "assets/images/img_clock.png",
+                                ),
+                                const SizedBox(height: 16),
+                                Container(
+                                  height: 2,
+                                  width: double.infinity,
+                                  color: const Color(0xffC5E6DB),
+                                ),
+                                const SizedBox(height: 16),
+                                Time(
+                                  pray: "Dzuhur",
+                                  time: _jadwalSholat![0]['dzuhur'] ?? "N/A",
+                                  image: "assets/images/img_clock.png",
+                                ),
+                                const SizedBox(height: 16),
+                                Container(
+                                  height: 2,
+                                  width: double.infinity,
+                                  color: const Color(0xffC5E6DB),
+                                ),
+                                const SizedBox(height: 16),
+                                Time(
+                                  pray: "Ashar",
+                                  time: _jadwalSholat![0]['ashr'] ?? "N/A",
+                                  image: "assets/images/img_clock.png",
+                                ),
+                                const SizedBox(height: 16),
+                                Container(
+                                  height: 2,
+                                  width: double.infinity,
+                                  color: const Color(0xffC5E6DB),
+                                ),
+                                const SizedBox(height: 16),
+                                Time(
+                                  pray: "Maghrib",
+                                  time: _jadwalSholat![0]['magrib'] ?? "N/A",
+                                  image: "assets/images/img_clock.png",
+                                ),
+                                const SizedBox(height: 16),
+                                Container(
+                                  height: 2,
+                                  width: double.infinity,
+                                  color: const Color(0xffC5E6DB),
+                                ),
+                                const SizedBox(height: 16),
+                                Time(
+                                  pray: "Isya",
+                                  time: _jadwalSholat![0]['isya'] ?? "N/A",
+                                  image: "assets/images/img_clock.png",
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(
-                        height: 48,
-                      ),
-                      Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 24),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 32, vertical: 24),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          color: ColorConstant.colorWhite,
-                        ),
-                        child: Column(
-                          children: [
-                            Time(
-                              pray: "Subuh",
-                              time: _prayerTimes!.asr != null
-                                  ? DateFormat.jm().format(_prayerTimes!.fajr!)
-                                  : "N/A",
-                              image: "assets/images/img_clock.png",
-                            ),
-                            const SizedBox(
-                              height: 16,
-                            ),
-                            Container(
-                              height: 2,
-                              width: double.infinity,
-                              color: const Color(0xffC5E6DB),
-                            ),
-                            const SizedBox(
-                              height: 16,
-                            ),
-                            Time(
-                              pray: "Terbit",
-                              time: _prayerTimes!.sunrise != null
-                                  ? DateFormat.jm()
-                                      .format(_prayerTimes!.sunrise!)
-                                  : "N/A",
-                              image: "assets/images/img_clock.png",
-                            ),
-                            const SizedBox(
-                              height: 16,
-                            ),
-                            Container(
-                              height: 2,
-                              width: double.infinity,
-                              color: const Color(0xffC5E6DB),
-                            ),
-                            const SizedBox(
-                              height: 16,
-                            ),
-                            Time(
-                              pray: "Dzuhur",
-                              time: _prayerTimes!.dhuhr != null
-                                  ? DateFormat.jm().format(_prayerTimes!.dhuhr!)
-                                  : "N/A",
-                              image: "assets/images/img_clock.png",
-                            ),
-                            const SizedBox(
-                              height: 16,
-                            ),
-                            Container(
-                              height: 2,
-                              width: double.infinity,
-                              color: const Color(0xffC5E6DB),
-                            ),
-                            const SizedBox(
-                              height: 16,
-                            ),
-                            Time(
-                              pray: "Ashar",
-                              time: _prayerTimes!.asr != null
-                                  ? DateFormat.jm().format(_prayerTimes!.asr!)
-                                  : "N/A",
-                              image: "assets/images/img_clock.png",
-                            ),
-                            const SizedBox(
-                              height: 16,
-                            ),
-                            Container(
-                              height: 2,
-                              width: double.infinity,
-                              color: const Color(0xffC5E6DB),
-                            ),
-                            const SizedBox(
-                              height: 16,
-                            ),
-                            Time(
-                              pray: "Maghrib",
-                              time: _prayerTimes!.maghrib != null
-                                  ? DateFormat.jm()
-                                      .format(_prayerTimes!.maghrib!)
-                                  : "N/A",
-                              image: "assets/images/img_clock.png",
-                            ),
-                            const SizedBox(
-                              height: 16,
-                            ),
-                            Container(
-                              height: 2,
-                              width: double.infinity,
-                              color: const Color(0xffC5E6DB),
-                            ),
-                            const SizedBox(
-                              height: 16,
-                            ),
-                            Time(
-                              pray: "Isya",
-                              time: _prayerTimes!.isha != null
-                                  ? DateFormat.jm().format(_prayerTimes!.isha!)
-                                  : "N/A",
-                              image: "assets/images/img_clock.png",
-                            ),
-                          ],
-                        ),
-                      ),
                     ],
                   ),
-                ],
-              ),
-            ),
+                ),
     );
   }
 }

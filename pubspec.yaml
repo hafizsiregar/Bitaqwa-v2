@@ -38,12 +38,11 @@ dependencies:
   flutter_masked_text2: ^0.9.1
   intl: ^0.18.1
   geolocator: ^11.0.0
-  adhan_dart: ^1.1.2
   permission_handler: ^11.3.1
   geocoding: ^3.0.0
-  timezone: ^0.9.3
   chewie: ^1.8.1
   youtube_player_flutter: ^8.0.0
+  http: ^1.2.1
 
 dev_dependencies:
   flutter_test:
